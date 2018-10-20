@@ -79,7 +79,6 @@ verify: .PHONY
 
 deploy: .PHONY
 	mvn clean deploy -DskipTests
-	${MAKE} helm/release
 
 jx-release-version: .PHONY
 	$(shell jx-release-version > VERSION)
