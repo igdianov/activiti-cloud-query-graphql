@@ -36,14 +36,12 @@ checkout: credentials
 	git checkout $(RELEASE_BRANCH) 
 
 skaffold/release: release-version
-	$(eval VERSION = $(shell echo $(RELEASE_VERSION)))
-	@echo doing skaffold docker build with tag=$(VERSION)
-	#skaffold build -f skaffold.yaml 
+	@echo doing skaffold docker build with tag=$(RELEASE_VERSION)
+	export VERSION=$(RELEASE_VERSION) && skaffold build -f skaffold.yaml 
 
 skaffold/preview: preview-version
-	$(eval VERSION = $(shell echo $(PREVIEW_VERSION)))	
-	@echo doing skaffold docker build with tag=$(VERSION)
-	#skaffold build -f skaffold.yaml 
+	@echo doing skaffold docker build with tag=$(PREVIEW_VERSION)
+	export VERSION=$(PREVIEW_VERSION) &&  skaffold build -f skaffold.yaml 
 
 skaffold/build: .PHONY
 	@echo doing skaffold docker build with tag=$(VERSION)
