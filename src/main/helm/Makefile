@@ -13,6 +13,7 @@ build: clean init
 	helm lint
 
 package: build 
+    helm add repo chart-repo @CHART_REPO@
 	helm package .
 
 install: clean build

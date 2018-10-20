@@ -1,14 +1,14 @@
 dependencies:
 - alias: graphql-query
   name: activiti-cloud-query-graphql-query
-  repository: https://chartmuseum.jx.cloud.introproventures.com
+  repository: ${CHART_REPO}
   version: ${activiti-cloud-query-graphql-query.version}
 - alias: graphql-notifications
   name: activiti-cloud-query-graphql-notifications
-  repository: https://chartmuseum.jx.cloud.introproventures.com
+  repository: ${CHART_REPO}
   version: ${activiti-cloud-query-graphql-notifications.version}
 - alias: graphql-subscriptions
   name: activiti-cloud-query-graphql-subscriptions
-  repository: https://chartmuseum.jx.cloud.introproventures.com
+  repository: ${CHART_REPO}
   version: ${activiti-cloud-query-graphql-subscriptions.version}
   
