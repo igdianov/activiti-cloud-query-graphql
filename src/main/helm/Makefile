@@ -7,12 +7,12 @@ RELEASE_VERSION := $(shell cat ../../../VERSION)
 init:
 	helm init --client-only
 
-build: clean
+build: clean init
 	rm -rf requirements.lock
 	helm dependency build
 	helm lint
 
-package: build init
+package: build 
 	helm package .
 
 install: clean build
