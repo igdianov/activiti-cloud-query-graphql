@@ -121,7 +121,7 @@ helm/package: .PHONY
 	${MAKE_HELM} package
 
 helm/release: .PHONY
-	${MAKE_HELM} release
+	${MAKE_HELM} jx
 	
 tag: commit
 	git tag -fa v$(RELEASE_VERSION) -m "Release version $(RELEASE_VERSION)"

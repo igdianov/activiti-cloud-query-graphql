@@ -13,7 +13,7 @@ build: clean init
 	helm lint
 
 package: build 
-    helm repo add chart-repo @CHART_REPO@
+	helm repo add chart-repo @CHART_REPO@
 	helm package .
 
 install: clean build
@@ -29,6 +29,9 @@ clean:
 	rm -rf charts
 	rm -rf ${NAME}*.tgz
 
-release: package
+upload: package
 	curl --fail -u $(CHARTMUSEUM_CREDS_USR):$(CHARTMUSEUM_CREDS_PSW) --data-binary "@$(NAME)-$(shell sed -n 's/^version: //p' Chart.yaml).tgz" $(CHART_REPO)/api/charts
 	rm -rf ${NAME}*.tgz%
+
+release:
+	jx step helm release
