@@ -6,14 +6,14 @@ RELEASE_VERSION := $(shell cat ../../../VERSION)
 
 init:
 	helm init --client-only
+	helm repo add chart-repo @CHART_REPO@
 
-build: clean init
+lint: clean init
 	rm -rf requirements.lock
 	helm dependency build
 	helm lint
 
 package: build 
-	helm repo add chart-repo @CHART_REPO@
 	helm package .
 
 install: clean build
@@ -35,3 +35,6 @@ upload: package
 
 release:
 	jx step helm release
+	
+build:
+	jx step helm build	
