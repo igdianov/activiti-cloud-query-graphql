@@ -18,16 +18,19 @@
 			<groupId>org.activiti.cloud</groupId>
 			<artifactId>activiti-cloud-query-graphql-notifications</artifactId>
 			<version>${activiti-cloud-query-graphql-notifications.version}</version>
+			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>org.activiti.cloud</groupId>
 			<artifactId>activiti-cloud-query-graphql-query</artifactId>
 			<version>${activiti-cloud-query-graphql-query.version}</version>
+			<type>pom</type>
 		</dependency>
 		<dependency>
 			<groupId>org.activiti.cloud</groupId>
 			<artifactId>activiti-cloud-query-graphql-subscriptions</artifactId>
 			<version>${activiti-cloud-query-graphql-subscriptions.version}</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 
