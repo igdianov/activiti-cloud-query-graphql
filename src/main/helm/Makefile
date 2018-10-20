@@ -38,3 +38,6 @@ release:
 	
 build:
 	jx step helm build	
+	
+promote:
+	jx promote -b --all-auto --timeout 1h --version $(RELEASE_VERSION)	

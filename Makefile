@@ -100,10 +100,7 @@ changelog: git-rev-list
 	@echo Creating Github changelog for release: $(RELEASE_VERSION)
 	jx step changelog --version v$(RELEASE_VERSION) --generate-yaml=false --rev=$(REV) --previous-rev=$(PREVIOUS_REV)
 	
-jx/promote:
-	jx promote -b --all-auto --timeout 1h --version $(RELEASE_VERSION)	
-
-promote: changelog helm/release jx/promote
+promote: changelog helm/release helm/promote
 
 commit: .PHONY
 	mvn versions:commit
@@ -121,6 +118,9 @@ helm/package: .PHONY
 
 helm/release: .PHONY
 	${MAKE_HELM} release
+
+helm/promote:
+	${MAKE_HELM} promote 	
 	
 tag: commit
 	git tag -fa v$(RELEASE_VERSION) -m "Release version $(RELEASE_VERSION)"
