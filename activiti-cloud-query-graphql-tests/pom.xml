@@ -34,4 +34,46 @@
 		</dependency>
 	</dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+<!--
+                        <execution>
+                            <id>enforce-dependency</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <fail>false</fail>
+                                <rules>
+                                    <dependencyConvergence />
+                                </rules>
+                            </configuration>
+                        </execution>
+ -->
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <fail>true</fail>
+                            <rules>
+                                <requireSameVersions>
+                                    <uniqueVersions>true</uniqueVersions>
+                                    <dependencies>
+                                        <dependency>org.activiti.cloud:activiti-cloud-services-query-graphql*</dependency>
+                                    </dependencies>
+                                </requireSameVersions>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>    
+    </build>
+
 </project>

@@ -46,20 +46,6 @@
 					<artifactId>maven-enforcer-plugin</artifactId>
 					<version>3.0.0-M2</version>
 					<executions>
-<!--
-  						<execution>
-							<id>enforce-dependency</id>
-							<goals>
-								<goal>enforce</goal>
-							</goals>
-							<configuration>
-								<fail>false</fail>
-								<rules>
-									<dependencyConvergence />
-								</rules>
-							</configuration>
-						</execution>
- -->
   						<execution>
 							<id>enforce-reactor</id>
 							<goals>
@@ -72,23 +58,6 @@
 										<message>The reactor is not valid</message>
 										<ignoreModuleDependencies>false</ignoreModuleDependencies>
 									</reactorModuleConvergence>
-								</rules>
-							</configuration>
-						</execution>
-						<execution>
-							<id>enforce-versions</id>
-							<goals>
-								<goal>enforce</goal>
-							</goals>
-							<configuration>
-								<fail>true</fail>
-								<rules>
-									<requireSameVersions>
-										<uniqueVersions>true</uniqueVersions>
-										<dependencies>
-											<dependency>org.activiti.cloud:activiti-cloud-services-query-graphql*</dependency>
-										</dependencies>
-									</requireSameVersions>
 								</rules>
 							</configuration>
 						</execution>
@@ -157,13 +126,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<configuration>
-					<flattenMode>ossrh</flattenMode>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
