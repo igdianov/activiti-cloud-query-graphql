@@ -23,9 +23,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	
-		<activiti-cloud-query-graphql-query.version>1.0.28</activiti-cloud-query-graphql-query.version>
-		<activiti-cloud-query-graphql-notifications.version>1.0.25</activiti-cloud-query-graphql-notifications.version>
-		<activiti-cloud-query-graphql-subscriptions.version>1.0.21</activiti-cloud-query-graphql-subscriptions.version>
+		<activiti-cloud-query-graphql-query.version>1.0.29</activiti-cloud-query-graphql-query.version>
+		<activiti-cloud-query-graphql-notifications.version>1.0.26</activiti-cloud-query-graphql-notifications.version>
+		<activiti-cloud-query-graphql-subscriptions.version>1.0.22</activiti-cloud-query-graphql-subscriptions.version>
 		
 		<ORG>${env.ORG}</ORG>
 		<DOCKER_REGISTRY>${env.DOCKER_REGISTRY}</DOCKER_REGISTRY>
