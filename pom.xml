@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.activiti.cloud</groupId>
 	<artifactId>activiti-cloud-query-graphql</artifactId>
-	<version>7.0.0-SNAPSHOT</version>
+	<version>7.0.21</version>
 	<packaging>pom</packaging>
 
 	<name>Activiti Cloud :: Query GraphQL</name>
