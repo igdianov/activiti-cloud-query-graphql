@@ -25,7 +25,7 @@
 	
 		<activiti-cloud-query-graphql-query.version>1.0.48</activiti-cloud-query-graphql-query.version>
 		<activiti-cloud-query-graphql-notifications.version>1.0.38</activiti-cloud-query-graphql-notifications.version>
-		<activiti-cloud-query-graphql-subscriptions.version>1.0.33</activiti-cloud-query-graphql-subscriptions.version>
+		<activiti-cloud-query-graphql-subscriptions.version>1.0.35</activiti-cloud-query-graphql-subscriptions.version>
 		
 		<ORG>${env.ORG}</ORG>
 		<DOCKER_REGISTRY>${env.DOCKER_REGISTRY}</DOCKER_REGISTRY>
