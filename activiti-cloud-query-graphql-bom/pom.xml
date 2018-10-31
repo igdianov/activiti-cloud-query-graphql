@@ -9,37 +9,29 @@
 	</parent>
 	<artifactId>activiti-cloud-query-graphql-bom</artifactId>
 	<packaging>pom</packaging>
+    
+    <properties>
+        <flattenMode>bom</flattenMode>
+    </properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.activiti.cloud</groupId>
+				<groupId>org.activiti.cloud.query</groupId>
 				<artifactId>activiti-cloud-query-graphql-notifications</artifactId>
 				<version>${activiti-cloud-query-graphql-notifications.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.activiti.cloud</groupId>
+				<groupId>org.activiti.cloud.query</groupId>
 				<artifactId>activiti-cloud-query-graphql-query</artifactId>
 				<version>${activiti-cloud-query-graphql-query.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.activiti.cloud</groupId>
+				<groupId>org.activiti.cloud.query</groupId>
 				<artifactId>activiti-cloud-query-graphql-subscriptions</artifactId>
 				<version>${activiti-cloud-query-graphql-subscriptions.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<configuration>
-					<flattenMode>bom</flattenMode>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
