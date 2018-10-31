@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.activiti.cloud</groupId>
+		<groupId>org.activiti.cloud.query</groupId>
 		<artifactId>activiti-cloud-query-graphql</artifactId>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
@@ -15,19 +15,19 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.activiti.cloud</groupId>
+			<groupId>org.activiti.cloud.query</groupId>
 			<artifactId>activiti-cloud-query-graphql-notifications</artifactId>
 			<version>${activiti-cloud-query-graphql-notifications.version}</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>
-			<groupId>org.activiti.cloud</groupId>
+			<groupId>org.activiti.cloud.query</groupId>
 			<artifactId>activiti-cloud-query-graphql-query</artifactId>
 			<version>${activiti-cloud-query-graphql-query.version}</version>
 			<type>pom</type>
 		</dependency>
 		<dependency>
-			<groupId>org.activiti.cloud</groupId>
+			<groupId>org.activiti.cloud.query</groupId>
 			<artifactId>activiti-cloud-query-graphql-subscriptions</artifactId>
 			<version>${activiti-cloud-query-graphql-subscriptions.version}</version>
 			<type>pom</type>
@@ -65,7 +65,7 @@
                                 <requireSameVersions>
                                     <uniqueVersions>true</uniqueVersions>
                                     <dependencies>
-                                        <dependency>org.activiti.cloud:activiti-cloud-services-query-graphql*</dependency>
+                                        <dependency>org.activiti.cloud.query:activiti-cloud-services-query-graphql*</dependency>
                                     </dependencies>
                                 </requireSameVersions>
                             </rules>
