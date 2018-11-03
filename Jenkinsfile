@@ -31,9 +31,9 @@ spec:
   - name: gsutil
     image: introproventures/gsutil
     command:
-    - sh -c
+    - sh
     args:
-    - cat
+    - -c cat
     workingDir: /home/jenkins
     securityContext:
       privileged: false
