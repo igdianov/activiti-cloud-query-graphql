@@ -19,6 +19,7 @@ spec:
     value: true
     effect: NoSchedule
 
+  # Create sidecar container with gsutil to copy artifacts to Google bucket storage
   volumes:
   - name: gsutil-volume
     secret:
@@ -39,11 +40,6 @@ spec:
     securityContext:
       privileged: false
     tty: true
-    env:
-    - name: CHART_REPOSITORY
-      value: http://jenkins-x-chartmuseum:8080
-    - name: CHART_BUCKET
-      value: introproventures
     resources:
       requests:
         cpu: 128m
@@ -60,9 +56,12 @@ spec:
     }
     
     environment {
-      ORG               = "introproventures"
-      APP_NAME          = "activiti-cloud-query-graphql"
-      CHARTMUSEUM_CREDS = credentials("jenkins-x-chartmuseum")
+      ORG                   = "introproventures"
+      APP_NAME              = "activiti-cloud-query-graphql"
+      CHARTMUSEUM_CREDS     = credentials("jenkins-x-chartmuseum")
+      CHARTMUSEUM_GS_BUCKET = "introproventures"
+      CHARTMUSEUM_REPO      = "https://storage.googleapis.com/introproventures"
+      GITHUB_CHARTS_REPO    = "https://igdianov.github.io/activiti-cloud-query-graphql"
     }
     stages {
       stage("CI Build and push snapshot") {
@@ -77,6 +76,19 @@ spec:
         steps {
           container("maven") {
             sh "make preview"
+            
+          }
+          container("gsutil") {
+            sh "make chartmuseum/publish"
+          }
+          container("maven") {
+            sh "make helm/publish"
+
+            // Let's test helm chart repos 
+            sh "helm init --client-only"
+            sh "helm repo add ${CHARTMUSEUM_GS_BUCKET} ${CHARTMUSEUM_REPO}"
+            sh "helm repo add ${APP_NAME} ${GITHUB_CHARTS_REPO}"
+            sh "helm repo update"
           }
         }
       }
@@ -100,10 +112,9 @@ spec:
             
             // Let's deploy to Nexus
             sh "make deploy"
-          }
-          container("gsutil") {
-            // update 
-            sh "make chartmuseum/index.yaml"
+
+            // Let's publish helm chart to Github pages 
+            sh "make helm/publish"
           }
         }
       }
@@ -113,7 +124,23 @@ spec:
         }
         steps {
             container("maven") {
-              sh "make promote"
+              // Publish release to Github
+              sh "make changelog"
+              
+              // Release Helm chart in Chartmuseum  
+              sh "make helm/release"
+            }
+            container("gsutil") {
+              // Generate and publish chartmuseum index.yaml to Google storage bucket
+              // To consume published Helm charts from Google storage bucket use:
+              // helm init --client-only 
+              // helm repo add ${CHARTMUSEUM_GS_BUCKET} https://storage.googleapis.com/${CHARTMUSEUM_GS_BUCKET}"
+               
+              sh "make chartmuseum/publish"
+            }
+            container("maven") {
+              // Let's promote to environments 
+              sh "make helm/promote"
             }
         }
       }

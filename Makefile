@@ -10,8 +10,8 @@ RELEASE_ARTIFACT := $(GROUP_ID):$(ARTIFACT_ID)
 RELEASE_GREP_EXPR := '^[Rr]elease'
 
 MAKE_HELM := ${MAKE} -C target/charts/$(ARTIFACT_ID)
-CHART_REPO := $(or $(CHART_REPOSITORY),http://jenkins-x-chartmuseum:8080)
-GS_BUCKET := $(CHART_BUCKET)
+CHARTMUSEUM_URL := $(or $(CHART_REPOSITORY),http://jenkins-x-chartmuseum:8080)
+CHARTMUSEUM_GS_BUCKET := $(or $(CHARTMUSEUM_GS_BUCKET),$(ORG)-chartmuseum)
 
 .PHONY: ;
 
@@ -71,8 +71,7 @@ updatebot/update-loop: .PHONY
 
 preview: .PHONY
 	mvn versions:set -DnewVersion=$(PREVIEW_VERSION)
-	mvn install
-	#${MAKE} skaffold/preview
+	${MAKE} install
 
 install: .PHONY
 	mvn clean install
@@ -132,9 +131,9 @@ helm/release: .PHONY
 helm/promote:
 	${MAKE_HELM} promote 	
 	
-# run this command inside gsutil container in Jenkinsfile pipeline
-chartmuseum/index.yaml: 
-	curl --fail -L $(CHART_REPO)/index.yaml | gsutil cp - "gs://$(GS_BUCKET)/index.yaml"
+# run this command inside 'gsutil' container in Jenkinsfile pipeline
+chartmuseum/publish: 
+	curl --fail -L $(CHARTMUSEUM_URL)/index.yaml | gsutil cp - "gs://$(CHARTMUSEUM_GS_BUCKET)/index.yaml"
 	
 tag: commit
 	git tag -fa v$(RELEASE_VERSION) -m "Release version $(RELEASE_VERSION)"
@@ -146,4 +145,5 @@ reset: .PHONY
 release: version install tag deploy changelog  
 
 clean: revert
+	mvn clean
 	rm -f VERSION

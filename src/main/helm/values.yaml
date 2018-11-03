@@ -5,20 +5,14 @@
 graphql-query:
   replicaCount: 1
   image:
-    repository: ${DOCKER_REGISTRY}/${ORG}/activiti-cloud-query-graphql-query
-    tag: ${activiti-cloud-query-graphql-query.version}
     pullPolicy: IfNotPresent
 
 graphql-notifications:
   replicaCount: 1
   image:
-    repository: ${DOCKER_REGISTRY}/${ORG}/activiti-cloud-query-graphql-notifications
-    tag: ${activiti-cloud-query-graphql-notifications.version}
     pullPolicy: IfNotPresent
 
 graphql-subscriptions:
   replicaCount: 1
   image:
-    repository: ${DOCKER_REGISTRY}/${ORG}/activiti-cloud-query-graphql-subscriptions
-    tag: ${activiti-cloud-query-graphql-subscriptions.version}
     pullPolicy: IfNotPresent
