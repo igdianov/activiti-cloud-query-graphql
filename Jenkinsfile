@@ -18,8 +18,44 @@ spec:
     operator: Equal
     value: true
     effect: NoSchedule
+
+  volumes:
+  - name: gsutil-volume
+    secret:
+      secretName: gsutil-secret
+      items:
+      - key: .boto
+        path: .boto
+
+  containers:
+  - name: gsutil
+    image: introproventures/gsutil
+    command:
+    - /bin/sh -c
+    args:
+    - cat
+    workingDir: /home/jenkins
+    securityContext:
+      privileged: false
+    tty: true
+    env:
+    - name: CHART_REPOSITORY
+      value: http://jenkins-x-chartmuseum:8080
+    - name: CHART_BUCKET
+      value: introproventures
+    resources:
+      requests:
+        cpu: 128m
+        memory: 256Mi
+      limits:
+    volumeMounts:
+      - mountPath: /home/jenkins
+        name: workspace-volume
+      - name: gsutil-volume
+        mountPath: /root/.boto
+        subPath: .boto
 """        
-	} 
+        } 
     }
     
     environment {
@@ -63,6 +99,10 @@ spec:
             
             // Let's deploy to Nexus
             sh "make deploy"
+          }
+          container("gsutil") {
+            // update 
+            sh "make chartmuseum/index.yaml"
           }
         }
       }

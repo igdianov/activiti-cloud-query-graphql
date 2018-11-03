@@ -3,11 +3,15 @@ NAME := $(APP_NAME)
 OS := $(shell uname)
 
 RELEASE_BRANCH := master
-RELEASE_VERSION := $(shell cat VERSION)
-RELEASE_ARTIFACT := org.activiti.cloud:$(APP_NAME)
+RELEASE_VERSION := $(or $(shell cat VERSION), $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
+GROUP_ID := $(shell mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)
+ARTIFACT_ID := $(shell mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+RELEASE_ARTIFACT := $(GROUP_ID):$(ARTIFACT_ID)
 RELEASE_GREP_EXPR := '^[Rr]elease'
 
-MAKE_HELM := ${MAKE} -C target/charts/$(NAME)
+MAKE_HELM := ${MAKE} -C target/charts/$(ARTIFACT_ID)
+CHART_REPO := $(or $(CHART_REPOSITORY),http://jenkins-x-chartmuseum:8080)
+GS_BUCKET := $(CHART_BUCKET)
 
 .PHONY: ;
 
@@ -90,10 +94,10 @@ version: jx-release-version
 	mvn versions:set -DnewVersion=$(VERSION)
 	
 snapshot: .PHONY
-	$(eval RELEASE_VERSION = $(shell mvn versions:set -DnextSnapshot -q && mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
+	$(eval SNAPSHOT_VERSION = $(shell mvn versions:set -DnextSnapshot -q && mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
 	mvn versions:commit
 	git add --all
-	git commit -m "Update version to $(RELEASE_VERSION)" --allow-empty # if first release then no verion update is performed
+	git commit -m "Update version to $(SNAPSHOT_VERSION)" --allow-empty # if first release then no verion update is performed
 	git push
 
 changelog: git-rev-list
@@ -116,11 +120,21 @@ helm/build: .PHONY
 helm/package: .PHONY
 	${MAKE_HELM} package
 
+helm/deploy: .PHONY
+	${MAKE_HELM} deploy
+
+helm/publish: .PHONY
+	${MAKE_HELM} publish
+
 helm/release: .PHONY
 	${MAKE_HELM} release
 
 helm/promote:
 	${MAKE_HELM} promote 	
+	
+# run this command inside gsutil container in Jenkinsfile pipeline
+chartmuseum/index.yaml: 
+	curl --fail -L $(CHART_REPO)/index.yaml | gsutil cp - "gs://$(GS_BUCKET)/index.yaml"
 	
 tag: commit
 	git tag -fa v$(RELEASE_VERSION) -m "Release version $(RELEASE_VERSION)"
