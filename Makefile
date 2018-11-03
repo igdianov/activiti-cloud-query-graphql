@@ -122,7 +122,7 @@ helm/package: .PHONY
 helm/deploy: .PHONY
 	${MAKE_HELM} deploy
 
-helm/publish: .PHONY
+helm/publish: credentials
 	${MAKE_HELM} publish
 
 helm/release: .PHONY

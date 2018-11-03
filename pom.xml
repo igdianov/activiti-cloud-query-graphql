@@ -35,7 +35,7 @@
         <ORG>${project.organization.name}</ORG>
         <DOCKER_REGISTRY>docker.io</DOCKER_REGISTRY>
         <CHARTMUSEUM_REPO>http://jenkins-x-chartmuseum:8080</CHARTMUSEUM_REPO>
-        <GITHUB_CHARTS_REPO>https://github.com/${ORG}/${project.artifactId}</GITHUB_CHARTS_REPO>
+        <GITHUB_CHARTS_REPO>${project.scm.url}</GITHUB_CHARTS_REPO>
 
         <flattenMode>ossrh</flattenMode>
 
