@@ -61,7 +61,7 @@ spec:
       CHARTMUSEUM_CREDS     = credentials("jenkins-x-chartmuseum")
       CHARTMUSEUM_GS_BUCKET = "introproventures"
       CHARTMUSEUM_REPO      = "https://storage.googleapis.com/introproventures"
-      GITHUB_CHARTS_REPO    = "https://igdianov.github.io/activiti-cloud-query-graphql"
+      GITHUB_CHARTS_REPO    = "https://github.com/igdianov/activiti-cloud-query-graphql"
     }
     stages {
       stage("CI Build and push snapshot") {
@@ -87,7 +87,7 @@ spec:
             // Let's test helm chart repos 
             sh "helm init --client-only"
             sh "helm repo add ${CHARTMUSEUM_GS_BUCKET} ${CHARTMUSEUM_REPO}"
-            sh "helm repo add ${APP_NAME} ${GITHUB_CHARTS_REPO}"
+            sh "helm repo add ${APP_NAME} https://igdianov.github.io/${APP_NAME}"
             sh "helm repo update"
           }
         }
