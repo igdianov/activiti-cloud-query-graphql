@@ -31,7 +31,7 @@ spec:
   - name: gsutil
     image: introproventures/gsutil
     command:
-    - /bin/sh -c
+    - sh -c
     args:
     - cat
     workingDir: /home/jenkins
