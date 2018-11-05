@@ -9,8 +9,6 @@ ARTIFACT_ID := $(shell mvn help:evaluate -Dexpression=project.artifactId -q -Dfo
 RELEASE_ARTIFACT := $(GROUP_ID):$(ARTIFACT_ID)
 RELEASE_GREP_EXPR := '^[Rr]elease'
 
-MAKE_HELM := ${MAKE} -C target/charts/$(ARTIFACT_ID)
-
 .PHONY: ;
 
 # dependency on .PHONY prevents Make from 
@@ -81,7 +79,6 @@ preview: .PHONY
 
 install: .PHONY
 	mvn clean install
-	${MAKE} helm/package
 
 verify: .PHONY
 	mvn clean verify
@@ -108,8 +105,6 @@ changelog: git-rev-list
 	@echo Creating Github changelog for release: $(RELEASE_VERSION)
 	jx step changelog --version v$(RELEASE_VERSION) --generate-yaml=false --rev=$(REV) --previous-rev=$(PREVIOUS_REV)
 	
-promote: changelog helm/release helm/promote
-
 commit: VERSION
 	mvn versions:commit
 	git add --all
