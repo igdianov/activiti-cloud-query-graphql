@@ -19,38 +19,6 @@ spec:
     value: true
     effect: NoSchedule
 
-  # Create sidecar container with gsutil to copy artifacts to Google bucket storage
-  volumes:
-  - name: gsutil-volume
-    secret:
-      secretName: gsutil-secret
-      items:
-      - key: .boto
-        path: .boto
-
-  containers:
-  - name: gsutil
-    image: introproventures/gsutil
-    command:
-    - /bin/sh
-    - -c
-    args:
-    - cat
-    workingDir: /home/jenkins
-    securityContext:
-      privileged: false
-    tty: true
-    resources:
-      requests:
-        cpu: 128m
-        memory: 256Mi
-      limits:
-    volumeMounts:
-      - mountPath: /home/jenkins
-        name: workspace-volume
-      - name: gsutil-volume
-        mountPath: /root/.boto
-        subPath: .boto
 """        
         } 
     }
@@ -59,9 +27,6 @@ spec:
       ORG                   = "introproventures"
       APP_NAME              = "activiti-cloud-query-graphql"
       CHARTMUSEUM_CREDS     = credentials("jenkins-x-chartmuseum")
-      CHARTMUSEUM_GS_BUCKET = "introproventures"
-      CHARTMUSEUM_REPO      = "https://storage.googleapis.com/introproventures"
-      GITHUB_CHARTS_REPO    = "https://github.com/igdianov/activiti-cloud-query-graphql"
     }
     stages {
       stage("CI Build and push snapshot") {
@@ -78,17 +43,9 @@ spec:
             sh "make preview"
             
           }
-          container("gsutil") {
-            sh "make chartmuseum/publish"
-          }
           container("maven") {
-            sh "make helm/publish"
-
-            // Let's test helm chart repos 
-            sh "helm init --client-only"
-            sh "helm repo add ${CHARTMUSEUM_GS_BUCKET} ${CHARTMUSEUM_REPO}"
-            sh "helm repo add ${APP_NAME} https://igdianov.github.io/${APP_NAME}"
-            sh "helm repo update"
+            // Let's push changes and open PRs to downstream repositories
+            sh "make updatebot/push-version"
           }
         }
       }
@@ -102,7 +59,7 @@ spec:
             sh "make checkout"
 
             // so we can retrieve the version in later steps
-            sh "make version"
+            sh "make next-version"
             
             // Let's test first
             sh "make install"
@@ -112,36 +69,24 @@ spec:
             
             // Let's deploy to Nexus
             sh "make deploy"
-
-            // Let's publish helm chart to Github pages 
-            sh "make helm/publish"
           }
         }
       }
-      stage("Promote to Environments") {
+      stage("Update Versions") {
         when {
           branch "master"
         }
         steps {
-            container("maven") {
-              // Publish release to Github
-              sh "make changelog"
-              
-              // Release Helm chart in Chartmuseum  
-              sh "make helm/release"
-            }
-            container("gsutil") {
-              // Generate and publish chartmuseum index.yaml to Google storage bucket
-              // To consume published Helm charts from Google storage bucket use:
-              // helm init --client-only 
-              // helm repo add ${CHARTMUSEUM_GS_BUCKET} https://storage.googleapis.com/${CHARTMUSEUM_GS_BUCKET}"
-               
-              sh "make chartmuseum/publish"
-            }
-            container("maven") {
-              // Let's promote to environments 
-              sh "make helm/promote"
-            }
+          container("maven") {
+            // Let's push changes and open PRs to downstream repositories
+            sh "make updatebot/push-version"
+
+            // Let's update any open PRs
+            sh "make updatebot/update"
+
+            // Let's publish release notes in Github using commits between previous and last tags
+            sh "make changelog"
+          }
         }
       }
     }
