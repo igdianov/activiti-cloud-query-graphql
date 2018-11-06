@@ -86,12 +86,12 @@ verify: .PHONY
 deploy: .PHONY
 	mvn clean deploy -DskipTests
 
-VERSION: 
+jx-release-version: 
 	$(shell jx-release-version > VERSION)
 	$(eval RELEASE_VERSION = $(shell cat VERSION))
 	@echo Using next release version $(RELEASE_VERSION)
 
-next-version: VERSION
+next-version: jx-release-version
 	mvn versions:set -DnewVersion=$(RELEASE_VERSION)
 	
 snapshot: .PHONY
@@ -105,7 +105,7 @@ changelog: git-rev-list
 	@echo Creating Github changelog for release: $(RELEASE_VERSION)
 	jx step changelog --version v$(RELEASE_VERSION) --generate-yaml=false --rev=$(REV) --previous-rev=$(PREVIOUS_REV)
 	
-commit: VERSION
+commit: 
 	mvn versions:commit
 	git add --all
 	git commit -m "Release $(RELEASE_VERSION)" --allow-empty # if first release then no verion update is performed
