@@ -43,10 +43,6 @@ spec:
             sh "make preview"
             
           }
-          container("maven") {
-            // Let's push changes and open PRs to downstream repositories
-            sh "make updatebot/push-version"
-          }
         }
       }
       stage("Build Release") {
