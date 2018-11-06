@@ -18,14 +18,15 @@ spec:
     operator: Equal
     value: true
     effect: NoSchedule
+
 """        
-	} 
+        } 
     }
     
     environment {
-      ORG               = "introproventures"
-      APP_NAME          = "activiti-cloud-query-graphql"
-      CHARTMUSEUM_CREDS = credentials("jenkins-x-chartmuseum")
+      ORG                   = "introproventures"
+      APP_NAME              = "activiti-cloud-query-graphql"
+      CHARTMUSEUM_CREDS     = credentials("jenkins-x-chartmuseum")
     }
     stages {
       stage("CI Build and push snapshot") {
@@ -40,6 +41,7 @@ spec:
         steps {
           container("maven") {
             sh "make preview"
+            
           }
         }
       }
@@ -53,7 +55,7 @@ spec:
             sh "make checkout"
 
             // so we can retrieve the version in later steps
-            sh "make version"
+            sh "make next-version"
             
             // Let's test first
             sh "make install"
@@ -66,14 +68,21 @@ spec:
           }
         }
       }
-      stage("Promote to Environments") {
+      stage("Update Versions") {
         when {
           branch "master"
         }
         steps {
-            container("maven") {
-              sh "make promote"
-            }
+          container("maven") {
+            // Let's push changes and open PRs to downstream repositories
+            sh "make updatebot/push-version"
+
+            // Let's update any open PRs
+            sh "make updatebot/update"
+
+            // Let's publish release notes in Github using commits between previous and last tags
+            sh "make changelog"
+          }
         }
       }
     }

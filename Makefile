@@ -2,12 +2,12 @@ CURRENT=$(pwd)
 NAME := $(APP_NAME)
 OS := $(shell uname)
 
-RELEASE_BRANCH := master
-RELEASE_VERSION := $(shell cat VERSION)
-RELEASE_ARTIFACT := org.activiti.cloud:$(APP_NAME)
+RELEASE_BRANCH := $(or $(CHANGE_TARGET),$(shell git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'),master)
+RELEASE_VERSION := $(or $(shell cat VERSION), $(shell mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
+GROUP_ID := $(shell mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout)
+ARTIFACT_ID := $(shell mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+RELEASE_ARTIFACT := $(GROUP_ID):$(ARTIFACT_ID)
 RELEASE_GREP_EXPR := '^[Rr]elease'
-
-MAKE_HELM := ${MAKE} -C target/charts/$(NAME)
 
 .PHONY: ;
 
@@ -55,7 +55,15 @@ updatebot/push: .PHONY
 
 updatebot/push-version: .PHONY
 	@echo doing updatebot push-version
-	updatebot push-version --kind maven $(RELEASE_ARTIFACT) $(RELEASE_VERSION)
+	$(eval QUERY_VERSION := $(shell mvn help:evaluate -Dexpression=$(ARTIFACT_ID)-query.version -q -DforceStdout))
+	$(eval NOTIFICATIONS_VERSION := $(shell mvn help:evaluate -Dexpression=$(ARTIFACT_ID)-notifications.version -q -DforceStdout))
+	$(eval SUBSCRIPTIONS_VERSION := $(shell mvn help:evaluate -Dexpression=$(ARTIFACT_ID)-subscriptions.version -q -DforceStdout))
+
+	@echo Push artifact versions into Helm chart requirements.yaml 
+	updatebot push-version --kind helm $(RELEASE_ARTIFACT) $(RELEASE_VERSION) \
+        $(ARTIFACT_ID)-query $(QUERY_VERSION) \
+        $(ARTIFACT_ID)-notifications $(NOTIFICATIONS_VERSION) \
+        $(ARTIFACT_ID)-subscriptions $(SUBSCRIPTIONS_VERSION)
 
 updatebot/update: .PHONY
 	@echo doing updatebot update $(RELEASE_VERSION)
@@ -67,12 +75,10 @@ updatebot/update-loop: .PHONY
 
 preview: .PHONY
 	mvn versions:set -DnewVersion=$(PREVIEW_VERSION)
-	mvn install
-	#${MAKE} skaffold/preview
+	${MAKE} install
 
 install: .PHONY
 	mvn clean install
-	${MAKE} helm/package
 
 verify: .PHONY
 	mvn clean verify
@@ -80,29 +86,26 @@ verify: .PHONY
 deploy: .PHONY
 	mvn clean deploy -DskipTests
 
-jx-release-version: .PHONY
+VERSION: 
 	$(shell jx-release-version > VERSION)
-	$(eval VERSION = $(shell cat VERSION))
-	$(eval RELEASE_VERSION = $(VERSION))
-	@echo Using next release version $(VERSION)
+	$(eval RELEASE_VERSION = $(shell cat VERSION))
+	@echo Using next release version $(RELEASE_VERSION)
 
-version: jx-release-version
-	mvn versions:set -DnewVersion=$(VERSION)
+next-version: VERSION
+	mvn versions:set -DnewVersion=$(RELEASE_VERSION)
 	
 snapshot: .PHONY
-	$(eval RELEASE_VERSION = $(shell mvn versions:set -DnextSnapshot -q && mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
+	$(eval SNAPSHOT_VERSION = $(shell mvn versions:set -DnextSnapshot -q && mvn help:evaluate -Dexpression=project.version -q -DforceStdout))
 	mvn versions:commit
 	git add --all
-	git commit -m "Update version to $(RELEASE_VERSION)" --allow-empty # if first release then no verion update is performed
+	git commit -m "Update version to $(SNAPSHOT_VERSION)" --allow-empty # if first release then no verion update is performed
 	git push
 
 changelog: git-rev-list
 	@echo Creating Github changelog for release: $(RELEASE_VERSION)
 	jx step changelog --version v$(RELEASE_VERSION) --generate-yaml=false --rev=$(REV) --previous-rev=$(PREVIOUS_REV)
 	
-promote: changelog helm/release helm/promote
-
-commit: .PHONY
+commit: VERSION
 	mvn versions:commit
 	git add --all
 	git commit -m "Release $(RELEASE_VERSION)" --allow-empty # if first release then no verion update is performed
@@ -110,19 +113,8 @@ commit: .PHONY
 revert: .PHONY
 	mvn versions:revert
 
-helm/build: .PHONY
-	${MAKE_HELM} build
-
-helm/package: .PHONY
-	${MAKE_HELM} package
-
-helm/release: .PHONY
-	${MAKE_HELM} release
-
-helm/promote:
-	${MAKE_HELM} promote 	
-	
 tag: commit
+	git status
 	git tag -fa v$(RELEASE_VERSION) -m "Release version $(RELEASE_VERSION)"
 	git push origin v$(RELEASE_VERSION)
 	
@@ -132,4 +124,5 @@ reset: .PHONY
 release: version install tag deploy changelog  
 
 clean: revert
+	mvn clean
 	rm -f VERSION
